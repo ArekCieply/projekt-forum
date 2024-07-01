@@ -1,0 +1,16 @@
+<h3>Szukanie</h3>
+<p><input type="text" id="searchText" name="searchText" #searchText></p>
+
+<div>
+    <input type="radio" value="użytkownikach" name="choice" [(ngModel)]="choice"> użytkownicy
+    <input type="radio" value="tematach" name="choice" [(ngModel)]="choice"> tematy
+</div>
+<button class="click-button" type="button" (click)="submit(searchText.value)">szukaj w {{choice}}</button>
+<div *ngIf="choice=='użytkownikach'">
+    <br>
+    <app-search-user-list></app-search-user-list>
+</div>
+<div *ngIf="choice=='tematach'">
+    <br>
+    <app-search-topic-list></app-search-topic-list>
+</div>

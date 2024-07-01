@@ -1,0 +1,30 @@
+<div class="container, list-item">
+    <div class="row">
+
+        <div class="col-sm-10">
+            <a routerLinkActive="active" [routerLink]="['/subsection',section.id]" style="cursor: pointer;">
+                <h4>{{ section.name }}</h4>
+            </a>
+        </div>
+
+    </div>
+    <div *ngIf="logedUser" class="row">
+        <div class="col-sm-1">
+            
+        </div>
+        <div class="col-sm-1">
+            <div *ngIf="logedUser.role=='administrator' || logedUser.role=='moderator'">
+                <button class="click-button" type="button" (click)="deleteSection()">Usuń</button>
+            </div>
+        </div>
+        <div class="col-sm-1">
+            <div *ngIf="logedUser.role=='administrator' || logedUser.role=='moderator'">
+                <button class="click-button" type="button" (click)="editSection()">Edytuj</button>
+            </div>
+        </div>
+        <div *ngIf="display">
+            <app-section-edit [section]="section" (displayEvent)="close($event)"></app-section-edit>
+        </div>
+    </div>
+</div>
+<br>

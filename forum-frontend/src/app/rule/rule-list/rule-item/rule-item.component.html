@@ -1,0 +1,22 @@
+<div class="container, list-item">
+    <div class="row">
+        <div class="col-sm-12" style="overflow-wrap: break-word;">
+            <h4>{{ rule.rule }}</h4>
+        </div>
+    </div>
+
+    <div *ngIf="logedUser.role=='administrator' || logedUser.role=='moderator'" class="row">
+        <div class="col-sm-1">
+        </div>
+        <div class="col-sm-1">
+            <button class="click-button" type="button" (click)="deleteRule()">Usuń</button>
+        </div>
+        <div class="col-sm-1">
+            <button class="click-button" type="button" (click)="editRule()">Edytuj</button>
+        </div>
+        <div *ngIf="display">
+            <app-rule-edit [rule]="rule" (displayEvent)="close($event)"></app-rule-edit>
+        </div>
+    </div>
+</div>
+<br>

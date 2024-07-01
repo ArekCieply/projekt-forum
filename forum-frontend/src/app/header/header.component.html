@@ -1,0 +1,60 @@
+<div class="d-none d-sm-block">
+    <div class="container, head">
+        <div class="row">
+            <div class="col-sm-2">
+                <a routerLink="/section">Forum</a>
+            </div>
+            <div class="col-sm-2">
+                <a routerLink="/auth">Autoryzacja</a>
+            </div>
+            <div class="col-sm-2">
+                <a routerLink="/search">Szukaj</a>
+            </div>
+            <div class="col-sm-2">
+                <div class="dropdown">
+                    <button class="dropbtn , click-button">Styl strony</button>
+                    <div class="dropdown-content">
+                        <button class="click-button" type="button" (click)="dayTheme()">Dzien</button>
+                        <button class="click-button" type="button" (click)="nightTheme()">Noc</button>
+                    </div>
+                </div>
+            </div>
+            <div *ngIf="authenticated" class="col-sm-2">
+                <a [routerLink]="['/user',currentuser.id]">{{currentuser.name}}</a>
+            </div>
+            <div class="col-sm-2">
+                <button type="button" (click)="logout()" class="click-button">wylogowanie</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container, head">
+    <div class="d-sm-none">
+        <button class="click-button" (click)=toggle()>Menu</button>
+        <div [hidden]="display">
+
+            <div style="align-items: center; text-align: center;">
+
+                <a routerLink="/section" (click)="toggle()">Forum</a>
+                <br>
+                <a routerLink="/auth" (click)="toggle()">Autoryzacja</a>
+                <br>
+                <a routerLink="/search" (click)="toggle()">Szukaj</a>
+                <br>
+                <div class="dropdown">
+                    <button class="dropbtn , click-button">Styl strony</button>
+                    <div class="dropdown-content">
+                        <button class="click-button" type="button" (click)="dayTheme()">Dzien</button>
+                        <button class="click-button" type="button" (click)="nightTheme()">Noc</button>
+                    </div>
+                </div>
+                <br>
+                <div *ngIf="authenticated">
+                    <a [routerLink]="['/user',currentuser.id]" (click)="toggle()">{{currentuser.name}}</a>
+                    <br>
+                    <button type="button" (click)="logout()" class="click-button">wylogowanie</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

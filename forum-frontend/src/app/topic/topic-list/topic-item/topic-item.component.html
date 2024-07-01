@@ -1,0 +1,30 @@
+<div class="container, list-item">
+    <div class="row">
+
+        <div class="col-sm-8">
+            <a routerLinkActive="active" [routerLink]="['/topic',topic.id]" style="cursor: pointer;">
+                <h4>{{ topic.name }}</h4>
+            </a>
+        </div>
+
+    </div>
+    <div *ngIf="logedUser" class="row">
+        <div class="col-sm-1">
+            
+        </div>
+        <div class="col-sm-1">
+            <div *ngIf="logedUser.role=='administrator' || logedUser.role=='moderator'">
+                <button class="click-button" type="button" (click)="deleteTopic()">Usuń</button>
+            </div>
+        </div>
+        <div class="col-sm-1">
+            <div *ngIf="logedUser.role=='administrator' || logedUser.role=='moderator'">
+                <button class="click-button" type="button" (click)="editTopic()">Edytuj</button>
+            </div>
+        </div>
+        <div *ngIf="display">
+            <app-topic-edit [topic]="topic" (displayEvent)="close($event)"></app-topic-edit>
+        </div>
+    </div>
+</div>
+<br>

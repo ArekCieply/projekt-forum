@@ -1,0 +1,5 @@
+<h3> Nazwa</h3>
+<p><input type="text" id="name" name="name" #name [value]="topic.name"></p>
+<h3> Treść</h3>
+<p><input type="text" id="content" name="content" #content [value]="topic.content"></p>
+<button class="click-button" type="button" (click)="save(name.value, content.value)">Zapisz</button>

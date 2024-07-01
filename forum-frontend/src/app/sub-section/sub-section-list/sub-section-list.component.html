@@ -1,0 +1,9 @@
+<div>
+    <app-sub-section-create [sectionId]="sectionId"></app-sub-section-create>
+</div>
+<br>
+<app-sub-section-item *ngFor="let sub_section of sub_sections ; let i = index" 
+[sub_section]="sub_section" 
+[sectionId]="sectionId"
+[index]="i">
+</app-sub-section-item>

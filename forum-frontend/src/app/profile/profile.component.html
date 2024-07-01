@@ -1,0 +1,33 @@
+<p>Profil</p>
+<p>{{ user.name }}</p>
+<p>Rola: {{ user.role }}</p>
+<p>Punkty: {{ user.score }}</p>
+<div *ngIf="logedUser.id != user.id">
+    <button class="click-button" type="button" (click)="sendMessage()">Wyślij wiadomość</button>
+    <div *ngIf="logedUser.role=='administrator' || logedUser.role=='moderator'">
+        <br>
+        <span *ngIf="user.isBanned==false">
+            <button class="click-button" type="button" (click)="ban()">Zablokuj</button>
+        </span>
+        <span *ngIf="user.isBanned==true">
+            <button class="click-button" type="button" (click)="unBan()">Odblokuj</button>
+        </span>
+        <br><br>
+        <span *ngIf="user.role=='user'">
+            <button class="click-button" type="button" (click)="promote()">Awansuj</button>
+        </span>
+        <span *ngIf="user.role=='moderator'">
+            <button class="click-button" type="button" (click)="demote()">Degraduj</button>
+        </span>
+    </div>
+</div>
+
+<div *ngIf="logedUser.id == user.id">
+    <button class="click-button" type="button" (click)="changePass()">Zmień hasło</button>
+    <div *ngIf="display">
+        <app-profile-change-pass (displayEvent)="close($event)"></app-profile-change-pass>
+    </div>
+    <br>
+    <a [routerLink]="['/converations',logedUser.id]">Rozmowy</a>
+</div>
+<app-profile-activity-list></app-profile-activity-list>

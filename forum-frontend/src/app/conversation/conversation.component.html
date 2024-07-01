@@ -1,0 +1,15 @@
+<div class="row g-0">
+    <div class="col-md-2 g-0 d-lg-none">
+        <button class="click-button" (click)=toggle()>Lista rozmów</button>
+        <div [hidden]="display">
+            <app-conversation-list></app-conversation-list>
+        </div>
+    </div>
+
+    <div class="col-md-2 g-0 d-none d-lg-block">
+        <app-conversation-list></app-conversation-list>
+    </div>
+    <div class="col-sm-10  g-0">
+        <router-outlet></router-outlet>
+    </div>
+</div>

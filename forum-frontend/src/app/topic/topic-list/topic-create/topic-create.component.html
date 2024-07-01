@@ -1,0 +1,7 @@
+<p>Nowy temat</p>
+
+<h3>Tytuł</h3>
+<p><input type="text" id="title" name="title" #title></p>
+<h3>Treść</h3>
+<p><textarea id="content" name="content" #content ></textarea></p>
+<button class="click-button" type="button" (click)="submit(title.value, content.value)">Nowy temat</button>

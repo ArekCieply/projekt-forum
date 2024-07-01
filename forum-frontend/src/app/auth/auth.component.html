@@ -1,0 +1,26 @@
+<div class="container">
+<h3> Nazwa</h3>
+<p><input type="text" id="username" name="username" #username></p>
+<h3> Hasło</h3>
+<p><input type="password" id="pass" name="pass" #pass></p>
+
+<div>
+  <input type="radio" value="login" name="choice" [(ngModel)]="choice"> Logowanie
+  <input type="radio" value="register" name="choice" [(ngModel)]="choice"> Rejestracja
+  <button class="click-button" type="button" (click)="submit(username.value, pass.value)">{{choice}}</button>
+  <p style="color: red;">{{ err }}</p>
+</div>
+
+<br>
+
+  <div class="row">
+    <div class="col-sm-2">
+    <button type="button" (click)="facebookSignin()" class="btn btn-primary btn-block">Logowanie Facebook</button>
+  </div>
+  <div class="col-sm-2">
+    <asl-google-signin-button type='icon' size='medium'></asl-google-signin-button>
+  </div>
+  </div>
+</div>
+<br>
+<a routerLink="/rules">Reguły forum</a>

@@ -1,0 +1,7 @@
+<div>
+    <app-topic-create [subSectionId]="subSectionId"></app-topic-create>
+</div>
+<br>
+<p>Tematy:</p>
+<app-topic-item *ngFor="let topic of topics ; let i = index" [topic]="topic" [index]="i" [subSectionId]="subSectionId">
+</app-topic-item>
