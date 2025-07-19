@@ -62,6 +62,8 @@ import { RuleEditComponent } from './rule/rule-list/rule-item/rule-edit/rule-edi
 import { ConfigService } from './shared/config.service';
 import { Config } from './shared/config.model';
 import { map } from 'rxjs';
+import { AuthQrComponent } from './auth/auth-qr/auth-qr.component';
+import { QRCodeModule } from 'angularx-qrcode';
 
 const init = (configService: ConfigService) => {
   return () => {
@@ -137,13 +139,15 @@ const getConfig = (configService: ConfigService) => {
     MessageCreateComponent,
     RuleCreateComponent,
     RuleEditComponent,
+    AuthQrComponent,
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
     FormsModule,
-    SocialLoginModule
+    SocialLoginModule,
+    QRCodeModule
   ],
   providers: [
     HttpService,

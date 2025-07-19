@@ -46,7 +46,7 @@ import repositories.UserRepository;
 public class UserAuthenticationProvider implements AuthenticationProvider {
 
     final UserRepository userRepository;
-
+    final JwtService jwt;
     PasswordEncoder passwordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
     @Value("${google.api}")
     String CLIENT_ID;
@@ -54,21 +54,22 @@ public class UserAuthenticationProvider implements AuthenticationProvider {
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         String name = authentication.getName();
-        String pass = authentication.getCredentials().toString();
+        System.out.println(authentication.getName());
+        System.out.println(authentication.getCredentials());
+
+        String token = authentication.getCredentials().toString();
+        if(!name.equals(jwt.getName(token))){
+            throw new BadCredentialsException("names don't match");
+        }
         User user = userRepository.findFirstByNameEquals(name);
         if (user == null) {
             throw new BadCredentialsException("name not found");
         }
-        if (user.getProvider().equals("facebook")) {
-            return fbAuth(user, pass, name);
-        } else if (user.getProvider().equals("google")) {
-            return googleAuth(user, pass, name);
-        }
 
-        if (passwordEncoder.matches(pass, user.getPass())) {
-            return new UsernamePasswordAuthenticationToken(name, pass, getUserRoles(user));
+        if (jwt.isValid(token, name)) {
+            return new UsernamePasswordAuthenticationToken(name,token, getUserRoles(user));
         } else {
-            throw new BadCredentialsException("wrong password");
+            throw new BadCredentialsException("token invalid");
         }
     }
 
@@ -97,42 +98,6 @@ public class UserAuthenticationProvider implements AuthenticationProvider {
         }
 
         return authorityList;
-    }
-
-    UsernamePasswordAuthenticationToken fbAuth(User user, String pass, String name) {
-        RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<FbResponse> response = restTemplate.getForEntity("https://graph.facebook.com/me?access_token=" + pass, FbResponse.class);
-        FbResponse fb = response.getBody();
-        if (fb.id.equals(user.getProviderId())) {
-            pass = user.getPass();
-            return new UsernamePasswordAuthenticationToken(name, pass, getUserRoles(user));
-        } else {
-            throw new BadCredentialsException("token id missmatch");
-        }
-    }
-
-    UsernamePasswordAuthenticationToken googleAuth(User user, String pass, String name) {
-        GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new GsonFactory())
-                .setAudience(Collections.singletonList(CLIENT_ID))
-                .build();
-
-        try {
-            GoogleIdToken idToken = verifier.verify(pass);
-            Payload payload = idToken.getPayload();
-            String userId = payload.getSubject();
-            if (userId.equals(user.getProviderId())) {
-                pass = user.getPass();
-                return new UsernamePasswordAuthenticationToken(name, pass, getUserRoles(user));
-            } else {
-                throw new BadCredentialsException("token id missmatch");
-            }
-
-        } catch (GeneralSecurityException ex) {
-            Logger.getLogger(UserAuthenticationProvider.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(UserAuthenticationProvider.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return null;
-    }
+    }  
 
 }

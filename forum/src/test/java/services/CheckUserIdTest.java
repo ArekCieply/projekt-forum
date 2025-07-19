@@ -46,7 +46,7 @@ public class CheckUserIdTest {
     public void setUp() {
         userRepository = Mockito.mock(UserRepository.class);
         instance = new CheckUserId(userRepository);
-        Mockito.when(userRepository.findFirstByNameEquals("test1")).thenReturn(new User(10,"test1",null,null,null,null,null,null));
+        Mockito.when(userRepository.findFirstByNameEquals("test1")).thenReturn(new User(10,"test1",null,null,null,null,null,null,null));
     }
 
     @AfterEach

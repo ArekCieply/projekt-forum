@@ -1,6 +1,7 @@
-import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, Subject } from 'rxjs';
+import { Observable, Subject, timer, of } from 'rxjs';
+import { switchMap, takeUntil, filter, catchError, timeout } from 'rxjs/operators';
 import { User } from '../shared/user.model';
 import { ConfigService } from '../shared/config.service';
 
@@ -12,7 +13,7 @@ export class AuthService {
   authenticatedChanged = new Subject<boolean>();
   private currentuser!: User;
   userChanged = new Subject<User>();
-  private pass!: string;
+  private token!: string;
   private data!: string[];
   err = new Subject<string>();
   constructor(
@@ -26,16 +27,16 @@ export class AuthService {
   getHeaders() {
     return new HttpHeaders({
       'Content-Type': 'application/json',
-      'Authorization': 'Basic ' + btoa(this.getCurrentUser().name + ':' + this.getPass())
+      'Authorization': 'Basic ' + btoa(this.getCurrentUser().name + ':' + this.getToken())
     })
   }
 
-  getUrl(){
+  getUrl() {
     return this.configService.getUrl();
   }
 
   registerUser(name: string, pass: string) {
-    this.http.post(this.getUrl()+'users/register', { name, pass }).subscribe((response) => {
+    this.http.post(this.getUrl() + 'users/register', { name, pass }).subscribe((response) => {
       console.log(response);
     },
       (err: HttpErrorResponse) => {
@@ -49,15 +50,15 @@ export class AuthService {
   }
 
   loginUser(name: string, pass: string) {
-    this.http.post(this.getUrl()+'users/login', { name, pass }).subscribe((response) => {
+    this.http.post(this.getUrl() + 'users/login', { name, pass }).subscribe((response) => {
       console.log(response);
       this.authenticated = true;
-      this.pass = pass;
       this.currentuser = <User>response;
       this.setUserChanged(this.currentuser);
       this.setAuthenticatedChanged(true);
+      this.token = this.currentuser.token!;
       localStorage.setItem('currentuser', JSON.stringify(this.currentuser));
-      localStorage.setItem('pass', this.pass);
+      localStorage.setItem('token', this.currentuser.token!);
       localStorage.setItem('authenticated', JSON.stringify(true));
     },
       (err: HttpErrorResponse) => {
@@ -70,16 +71,16 @@ export class AuthService {
     );
   }
 
-  facebookLogin(name: string, token: string) {
-    this.http.post(this.getUrl()+'users/login/facebook', { name, token }).subscribe((response) => {
+  facebookLogin(name: string, fbToken: string) {
+    this.http.post(this.getUrl() + 'users/login/facebook', { name, fbToken }).subscribe((response) => {
       console.log(response);
       this.authenticated = true;
-      this.pass = token;
       this.currentuser = <User>response;
       this.setUserChanged(this.currentuser);
       this.setAuthenticatedChanged(true);
+      this.token = this.currentuser.token!;
       localStorage.setItem('currentuser', JSON.stringify(this.currentuser));
-      localStorage.setItem('pass', this.pass);
+      localStorage.setItem('token', this.currentuser.token!);
       localStorage.setItem('authenticated', JSON.stringify(true));
     },
       err => {
@@ -89,16 +90,16 @@ export class AuthService {
     );
   }
 
-  googleLogin(name: string, token: string) {
-    this.http.post(this.getUrl()+'users/login/google', { name, token }).subscribe((response) => {
+  googleLogin(name: string, googleToken: string) {
+    this.http.post(this.getUrl() + 'users/login/google', { name, googleToken }).subscribe((response) => {
       console.log(response);
       this.authenticated = true;
-      this.pass = token;
       this.currentuser = <User>response;
       this.setUserChanged(this.currentuser);
       this.setAuthenticatedChanged(true);
+      this.token = this.currentuser.token!;
       localStorage.setItem('currentuser', JSON.stringify(this.currentuser));
-      localStorage.setItem('pass', this.pass);
+      localStorage.setItem('token', this.currentuser.token!);
       localStorage.setItem('authenticated', JSON.stringify(true));
     },
       err => {
@@ -110,7 +111,7 @@ export class AuthService {
 
   changePass(id: number, oldPass: string, newPass: string) {
     this.httpOptions.headers = this.getHeaders()
-    this.http.post(this.getUrl()+'users/change_pass', { id, oldPass, newPass }, this.httpOptions).subscribe((response) => {
+    this.http.post(this.getUrl() + 'users/change_pass', { id, oldPass, newPass }, this.httpOptions).subscribe((response) => {
       console.log(response);
 
     },
@@ -121,6 +122,43 @@ export class AuthService {
     );
   }
 
+  QRStart(token: string) {
+    this.http.post(this.getUrl() + 'users/qr/start', { token }).subscribe((response) => {
+      console.log(response);
+    },
+      (err: HttpErrorResponse) => {
+        console.log(err.message);
+
+      }
+    );
+    this.QRCheck(token)
+  }
+
+  QRCheck(token: string) {
+    const pollingInterval = 3000;
+    const maxPollingTime = 100000;
+
+    timer(0, pollingInterval).pipe(
+      takeUntil(timer(maxPollingTime)),
+      switchMap(() =>
+        this.http.post(this.getUrl() + 'users/qr/check', { token }, { observe: 'response' }).pipe(
+          catchError(error => {
+            console.error(error.message);
+            return of(null);
+          })
+        )
+      ),
+      filter((response: HttpResponse<any> | null) => !!response && response.status === 200)
+    ).subscribe({
+      next: (response) => {
+        console.log(response);
+        this.saveUserData(<User>response!.body)
+      },
+      complete: () => console.log('done')
+    });
+
+
+  }
 
   getCurrentUser() {
     return this.currentuser;
@@ -128,11 +166,11 @@ export class AuthService {
   getAuthenticated() {
     return this.authenticated;
   }
-  getPass() {
-    return this.pass;
+  getToken() {
+    return this.token;
   }
-  setPass(pass: string) {
-    this.pass = pass;
+  setToken(token: string) {
+    this.token = token;
   }
   setErr(err: string) {
     this.err.next(err);
@@ -148,30 +186,41 @@ export class AuthService {
 
   getAuthData(): string[] {
     this.data[0] = this.currentuser.name
-    this.data[1] = this.pass
+    this.data[1] = this.token
     return this.data
   }
 
   checkLocalStorage() {
     this.currentuser = JSON.parse(localStorage.getItem('currentuser')!) as User;
-    this.pass = localStorage.getItem('pass') as string;
+    this.token = localStorage.getItem('token') as string;
     this.authenticated = JSON.parse(localStorage.getItem('authenticated')!) as boolean;
     this.setUserChanged(this.currentuser);
     this.setAuthenticatedChanged(this.authenticated);
     console.log(this.currentuser)
     console.log(this.authenticated)
-    console.log(this.pass)
+    console.log(this.token)
   }
 
   logOut() {
     localStorage.removeItem('currentuser');
-    localStorage.removeItem('pass');
+    localStorage.removeItem('token');
     localStorage.removeItem('authenticated');
     this.setUserChanged({} as User);
     this.setAuthenticatedChanged(false);
     this.currentuser = {} as User
-    this.pass != null
+    this.token != null
     this.authenticated = false;
+  }
+
+  saveUserData(user: User) {
+    this.authenticated = true;
+    this.currentuser = <User>user;
+    this.setUserChanged(this.currentuser);
+    this.setAuthenticatedChanged(true);
+    this.token = this.currentuser.token!;
+    localStorage.setItem('currentuser', JSON.stringify(this.currentuser));
+    localStorage.setItem('token', this.currentuser.token!);
+    localStorage.setItem('authenticated', JSON.stringify(true));
   }
 
 }

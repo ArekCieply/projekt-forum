@@ -7,6 +7,7 @@ package controllers;
 import Exception.NameTakenException;
 import dto.ChangePassDto;
 import dto.PromoteModDto;
+import dto.QRDto;
 import dto.UserDto;
 import mappers.UserMapper;
 import entities.User;
@@ -123,5 +124,30 @@ public class UserController {
     ResponseEntity unBanUser(@RequestBody PromoteModDto dto, @RequestHeader("Authorization") String auth) {
         userService.unbanUser(dto.userId(), dto.targetId(), auth);
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping(path = "/qr/start")
+    public @ResponseBody
+    ResponseEntity QRStart(@RequestBody Map<String, String> json ) {
+        userService.qrStart(json.get("token"));
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping(path = "/qr/tie")
+    public @ResponseBody
+    ResponseEntity QRTie(@RequestBody QRDto dto, @RequestHeader("Authorization") String auth ) {
+        userService.qrTie(dto.token(), dto.id(), auth);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping(path = "/qr/check")
+    public @ResponseBody
+    ResponseEntity QRCheck(@RequestBody Map<String, String> json ) {
+        User user = userService.qrCheck(json.get("token"));
+        if(user!=null){
+        return ResponseEntity.ok().body(userMapper.entityToDTO(user));
+        }else{
+            return ResponseEntity.status(202).body("pending");
+        }
     }
 }

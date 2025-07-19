@@ -5,6 +5,7 @@ export class User{
         public role?: string,
         public isBanned?: boolean,
         public id?: number,
+        public token?: string,
 
     ){}
 }

@@ -57,9 +57,10 @@ export class HttpService {
 
 
   getHeaders() {
+    console.log(this.authService.getToken())
     return new HttpHeaders({
       'Content-Type': 'application/json',
-      'Authorization': 'Basic ' + btoa(this.authService.getCurrentUser().name + ':' + this.authService.getPass())
+      'Authorization': 'Basic ' + btoa(this.authService.getCurrentUser().name + ':' + this.authService.getToken())
     })
   }
 getUrl(){

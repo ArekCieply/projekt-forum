@@ -15,6 +15,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 import org.mockito.Mockito;
+import org.springframework.data.redis.core.RedisTemplate;
+
 import repositories.UserRepository;
 
 /**
@@ -42,7 +44,9 @@ public class UserServiceTest {
         UserRepository userRepository = Mockito.mock(UserRepository.class);
         UserMapper userMapper = Mockito.mock(UserMapper.class);
         CheckUserId check = Mockito.mock(CheckUserId.class);
-        instance = new UserService(userRepository, userMapper, check);
+        JwtService jwt = Mockito.mock(JwtService.class);
+        RedisTemplate redis =Mockito.mock(RedisTemplate.class);
+        instance = new UserService(userRepository, userMapper, check, jwt, redis);
     }
 
     @AfterEach

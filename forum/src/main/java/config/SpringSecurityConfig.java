@@ -44,7 +44,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/topic/delete").hasAuthority("moderator")
                 .antMatchers("/topic/edit").hasAuthority("moderator")
                 .antMatchers("/post").hasAuthority("user")
-                .antMatchers("/topic").hasAuthority("user")
+                .antMatchers("/topic").hasAuthority("user")//todo update
                 
                 .and()
                 .httpBasic();

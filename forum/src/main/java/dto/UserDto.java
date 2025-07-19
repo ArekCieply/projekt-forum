@@ -16,6 +16,7 @@ public record UserDto(String name,
         Integer id,
         Boolean isBanned,
         Integer score,
-        @Enumerated(EnumType.STRING) RoleEnum role) {
+        @Enumerated(EnumType.STRING) RoleEnum role,
+        String token) {
 
 }

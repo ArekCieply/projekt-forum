@@ -23,4 +23,10 @@
   </div>
 </div>
 <br>
+<div >
+  <button class="click-button" type="button" (click)="showQR()">Logowanie QR</button>
+</div>
+<div *ngIf="display">
+  <app-auth-qr></app-auth-qr>
+</div>
 <a routerLink="/rules">Reguły forum</a>

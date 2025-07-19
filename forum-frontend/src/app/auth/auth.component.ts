@@ -11,6 +11,8 @@ export class AuthComponent implements OnInit {
   choice!: string;
   socialUser!: SocialUser;
   err!: string;
+  display = false;
+
   constructor(private authService: AuthService,
     private socialAuthService: SocialAuthService
   ) { }
@@ -29,6 +31,10 @@ export class AuthComponent implements OnInit {
   }
 
   googleSignin(): void {
+  }
+
+   showQR() {
+    this.display = !this.display;
   }
 
   ngOnInit(): void {
